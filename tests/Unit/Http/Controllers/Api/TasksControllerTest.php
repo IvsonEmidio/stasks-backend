@@ -8,7 +8,11 @@ use Tests\TestCase;
 class TasksControllerTest extends TestCase
 {
 
-    public function testGet()
+    /**
+     * Test the 'get' method on 'tasks' route
+     * @return void
+     */
+    public function testGet(): void
     {
         //Get json
         $response = $this->getJson('http://127.0.0.1:8000/api/tasks');
@@ -26,15 +30,17 @@ class TasksControllerTest extends TestCase
                             ->whereType('time', 'string')
                             ->wheretype('status', 'integer')
                             ->etc();
-                    }
-                    );
-            }
-            );
+                    });
+            });
     }
 
-    public function testCreate()
+    /**
+     * Test the 'post' method on 'tasks' route
+     * @return void
+     */
+    public function testCreate(): void
     {
-        //Request create new task
+        //Do request...
         $response = $this->post('http://127.0.0.1:8000/api/tasks', [
             'title' => 'buy new clothes',
             'note' => 'need to be blue',
@@ -42,21 +48,49 @@ class TasksControllerTest extends TestCase
             'time' => '17:00'
         ]);
 
-        //Assert statuses
+        //Assert the incoming JSON.
         $response->assertJson(function (AssertableJson $json) {
             return $json->where('status', 1)
                 ->where('msg', 'A new record has successfully created')->etc();
         });
     }
 
-    public function testCancel()
+    /**
+     * Test the 'delete' method on 'tasks' route
+     * @return void
+     */
+    public function testCancel(): void
     {
+        //Cancel the selected task...
         $response = $this->delete('http://127.0.0.1:8000/api/tasks?id=3');
 
+        //Do some assertions on received JSON.
         $response->assertJson(function (AssertableJson $json) {
             return $json->where('status', 1)
                 ->where('msg', 'Task successfully canceled')->etc();
         });
     }
 
+    /**
+     * Test the 'put' method on 'tasks' route
+     * @return void
+     */
+    public function testUpdate(): void
+    {
+        //Request update...
+        $response = $this->put('http://127.0.0.1:8000/api/tasks', [
+            'id' => 21,
+            'title' => 'buy new clothes',
+            'note' => 'need to be blue',
+            'date' => '2022/04/31',
+            'time' => '17:00'
+        ]);
+
+        //Do some assertions on received JSON.
+        $response->assertJson(function (AssertableJson $json) {
+            return $json->where('status', 1)
+                ->where('msg', 'All fields updated successfully')->etc();
+        });
+
+    }
 }

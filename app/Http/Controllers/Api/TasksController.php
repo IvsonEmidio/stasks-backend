@@ -18,22 +18,29 @@ class TasksController extends Controller
      */
     private $userId;
 
+    /**
+     * Default error messages
+     * @var string[]
+     */
+    private $defaultErrorMessages;
+
     public function __construct()
     {
         $this->userId = 1;
+        $this->defaultErrorMessages = [
+            'database' => 'An exception has occurred in database',
+            'validation' => 'Check the fields and try again'
+        ];
     }
 
     /**
      * Get all tasks from a user.
-     *
      * @return JsonResponse
      */
     public function index(): JsonResponse
     {
         try {
-            //Get all user tasks
             $userTasks = Tasks::where('creator_id', $this->userId)->orderBy('date')->get();
-
             return response()->json([
                 'status' => 1,
                 'msg' => 'All data retrieved',
@@ -42,7 +49,8 @@ class TasksController extends Controller
         } catch (QueryException $error) {
             return response()->json([
                 'status' => 0,
-                'msg' => 'An exception has occurred in database'
+                'msg' => $this->defaultErrorMessages['database'],
+                'data' => []
             ], 500);
         }
     }
@@ -83,58 +91,106 @@ class TasksController extends Controller
                 //An unknown error has occurred when inserting on database
                 return response()->json([
                     'status' => 0,
-                    'msg' => 'Error inserting new item on database'
+                    'msg' => $this->defaultErrorMessages['database']
                 ], 500);
             }
         } catch (ValidationException $error) {
             //An error on validation fields has occurred
             return response()->json([
                 'status' => 0,
-                'msg' => 'Check the fields and try again'
+                'msg' => $this->defaultErrorMessages['validation']
             ], 400);
         }
     }
 
     /**
-     * Remove the specified user task.
-     *
+     * Cancel the specified task.
      * @param Request $request
      * @return JsonResponse
      */
     public function cancel(Request $request): JsonResponse
     {
         //Validate the incoming data
-        $validated = $request->validate(
-            [
-                'id' => 'required|int'
-            ]
-        );
-        //Find the desired task
-        $task = Tasks::find($validated['id']);
+        try {
+            $validated = $request->validate(
+                [
+                    'id' => 'required|int'
+                ]
+            );
 
-        if ($task) {
-            //Cancel the desired task
             try {
-                $task->status = 0;
-                $task->save();
-                return response()->json([
+                //Find the desired task
+                $task = Tasks::find($validated['id']);
 
-                    'status' => 1,
-                    'msg' => 'Task successfully canceled'
-                ], 200);
+                //Cancel the desired task
+                if ($task) {
+                    $task->status = 0;
+                    $task->save();
+                    return response()->json([
+                        'status' => 1,
+                        'msg' => 'Task successfully canceled'
+                    ], 200);
+                } else {
+                    return response()->json([
+                        'status' => 0,
+                        'msg' => 'Task not found'
+                    ], 404);
+                }
             } catch (QueryException $error) {
-                //Catch query exception
+                //An error has occurred on database.
                 return response()->json([
                     'status' => 0,
-                    'msg' => 'An internal error has occurred'
+                    'msg' => $this->defaultErrorMessages['database']
                 ], 500);
             }
-        } else {
-            //Catch not found exception
+        } catch (ValidationException $error) {
+            //Error on fields validation
             return response()->json([
                 'status' => 0,
-                'msg' => 'Task not found'
-            ], 404);
+                'msg' => $this->defaultErrorMessages['validation']
+            ], 400);
+        }
+    }
+
+    /**
+     * Update the specified task.
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function update(Request $request): JsonResponse
+    {
+        //Validate the incoming data
+        try {
+            $validated = $request->validate([
+                'id' => 'required|int',
+                'title' => 'required|string|max:125',
+                'note' => 'required|string|max:255',
+                'date' => 'required|string|max:12',
+                'time' => 'required|string|max:6'
+            ]);
+
+            //Find the desired task and fulfill
+            try {
+                $task = Tasks::find($validated['id']);
+                $task->fill($validated);
+                $task->save();
+                return response()->json([
+                    'status' => 1,
+                    'msg' => 'All fields updated successfully'
+                ], 200);
+            } catch (QueryException $error) {
+                //An error has occurred in database
+                return response()->json([
+                    'status' => 0,
+                    'msg' => $this->defaultErrorMessages['database']
+                ], 500);
+            }
+        } catch (ValidationException $error) {
+            //Error on fields validation
+            return response()->json([
+                'status' => 0,
+                'msg' => $this->defaultErrorMessages['validation']
+            ], 400);
         }
     }
 }
