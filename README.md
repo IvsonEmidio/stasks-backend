@@ -43,7 +43,7 @@ php artisan migrate
 ```
 php artisan test
 ```
-Why not *composer test*? 
+*Why not *composer test*? *
 <br />
 R - All https tests made uses the package *Illuminate\Testing\Fluent\AssertableJson* from **Fluent JSON Laravel Testing**
 
