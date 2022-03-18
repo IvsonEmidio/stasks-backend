@@ -47,6 +47,9 @@ Why not *composer test*?
 <br />
 R - All https tests made uses the package *Illuminate\Testing\Fluent\AssertableJson* from **Fluent JSON Laravel Testing**
 
+## Documentation
+- All routes doc are available in this [link](https://jolly-harp-341.notion.site/Documentation-sTasks-Rest-402b32b58bd042b299125fbdea0d1b2e)
+
 ## How to contribute?
 - You can look in TODO list above and realize one needed task
 - You can find bugs or dangerous code 
