@@ -62,7 +62,7 @@ class TasksController extends Controller
      */
     public function create(Request $request): JsonResponse
     {
-        //Validate the incoming data.
+        //Validate the incoming d ata.
         try {
             $validated = $request->validate([
                 'title' => 'required|string|max:125',
@@ -72,7 +72,7 @@ class TasksController extends Controller
             ]);
             try {
                 //Creates a new task.
-                Tasks::create(
+                $createdTask = Tasks::create(
                     [
                         'creator_id' => $this->userId,
                         'title' => $validated['title'],
@@ -85,20 +85,23 @@ class TasksController extends Controller
                 //All done
                 return response()->json([
                     'status' => 1,
-                    'msg' => 'A new record has successfully created'
+                    'msg' => 'A new record has successfully created',
+                    'data' => $createdTask
                 ], 201);
             } catch (QueryException $error) {
                 //An unknown error has occurred when inserting on database
                 return response()->json([
                     'status' => 0,
-                    'msg' => $this->defaultErrorMessages['database']
+                    'msg' => $this->defaultErrorMessages['database'],
+                    'data' => []
                 ], 500);
             }
         } catch (ValidationException $error) {
             //An error on validation fields has occurred
             return response()->json([
                 'status' => 0,
-                'msg' => $this->defaultErrorMessages['validation']
+                'msg' => $this->defaultErrorMessages['validation'],
+                'data' => []
             ], 400);
         }
     }
@@ -128,26 +131,30 @@ class TasksController extends Controller
                     $task->save();
                     return response()->json([
                         'status' => 1,
-                        'msg' => 'Task successfully canceled'
+                        'msg' => 'Task successfully canceled',
+                        'data' => $task
                     ], 200);
                 } else {
                     return response()->json([
                         'status' => 0,
-                        'msg' => 'Task not found'
+                        'msg' => 'Task not found',
+                        'data' => []
                     ], 404);
                 }
             } catch (QueryException $error) {
                 //An error has occurred on database.
                 return response()->json([
                     'status' => 0,
-                    'msg' => $this->defaultErrorMessages['database']
+                    'msg' => $this->defaultErrorMessages['database'],
+                    'data' => []
                 ], 500);
             }
         } catch (ValidationException $error) {
             //Error on fields validation
             return response()->json([
                 'status' => 0,
-                'msg' => $this->defaultErrorMessages['validation']
+                'msg' => $this->defaultErrorMessages['validation'],
+                'data' => []
             ], 400);
         }
     }
@@ -176,20 +183,23 @@ class TasksController extends Controller
                 $task->save();
                 return response()->json([
                     'status' => 1,
-                    'msg' => 'All fields updated successfully'
+                    'msg' => 'All fields updated successfully',
+                    'data' => $task
                 ], 200);
             } catch (QueryException $error) {
                 //An error has occurred in database
                 return response()->json([
                     'status' => 0,
-                    'msg' => $this->defaultErrorMessages['database']
+                    'msg' => $this->defaultErrorMessages['database'],
+                    'data' => []
                 ], 500);
             }
         } catch (ValidationException $error) {
             //Error on fields validation
             return response()->json([
                 'status' => 0,
-                'msg' => $this->defaultErrorMessages['validation']
+                'msg' => $this->defaultErrorMessages['validation'],
+                'data' => []
             ], 400);
         }
     }

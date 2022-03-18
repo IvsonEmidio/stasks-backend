@@ -51,7 +51,20 @@ class TasksControllerTest extends TestCase
         //Assert the incoming JSON.
         $response->assertJson(function (AssertableJson $json) {
             return $json->where('status', 1)
-                ->where('msg', 'A new record has successfully created')->etc();
+                ->where('msg', 'A new record has successfully created')
+                ->has('data', function ($json) {
+                    return $json
+                        ->whereType('creator_id', 'integer')
+                        ->whereType('id', 'integer')
+                        ->whereType('title', 'string')
+                        ->whereType('note', 'string')
+                        ->whereType('date', 'string')
+                        ->whereType('time', 'string')
+                        ->wheretype('status', 'integer')
+                        ->whereType('updated_at', 'string')
+                        ->whereType('created_at', 'string')
+                        ->etc();
+                });
         });
     }
 
@@ -67,8 +80,23 @@ class TasksControllerTest extends TestCase
         //Do some assertions on received JSON.
         $response->assertJson(function (AssertableJson $json) {
             return $json->where('status', 1)
-                ->where('msg', 'Task successfully canceled')->etc();
+                ->where('msg', 'Task successfully canceled')
+                ->has('data', function ($json) {
+                    return $json
+                        ->whereType('creator_id', 'integer')
+                        ->whereType('id', 'integer')
+                        ->whereType('title', 'string')
+                        ->whereType('note', 'string')
+                        ->whereType('date', 'string')
+                        ->whereType('time', 'string')
+                        ->wheretype('status', 'integer')
+                        ->whereType('updated_at', 'string')
+                        ->whereType('created_at', 'string')
+                        ->where('status', 0);
+                });
         });
+
+
     }
 
     /**
@@ -89,7 +117,19 @@ class TasksControllerTest extends TestCase
         //Do some assertions on received JSON.
         $response->assertJson(function (AssertableJson $json) {
             return $json->where('status', 1)
-                ->where('msg', 'All fields updated successfully')->etc();
+                ->where('msg', 'All fields updated successfully')
+                ->has('data', function ($json) {
+                    return $json
+                        ->whereType('creator_id', 'integer')
+                        ->whereType('id', 'integer')
+                        ->whereType('title', 'string')
+                        ->whereType('note', 'string')
+                        ->whereType('date', 'string')
+                        ->whereType('time', 'string')
+                        ->wheretype('status', 'integer')
+                        ->whereType('updated_at', 'string')
+                        ->whereType('created_at', 'string');
+                });
         });
 
     }
