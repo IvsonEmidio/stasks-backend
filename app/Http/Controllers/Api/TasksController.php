@@ -62,7 +62,7 @@ class TasksController extends Controller
      */
     public function create(Request $request): JsonResponse
     {
-        //Validate the incoming d ata.
+        //Validate the incoming data.
         try {
             $validated = $request->validate([
                 'title' => 'required|string|max:125',
